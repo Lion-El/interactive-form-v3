@@ -15,22 +15,35 @@ const bitcoinSection = document.getElementById('bitcoin');
 const form = document.querySelector('form');
 let totalCost = 0;
 
-//form validation
-const validateName = name => /^[a-z]+$/i.test(name);
-const validateEmail = email => /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email);
-const validateCardNumber = cardNumber => /^\d{13,16}$/.test(cardNumber);
-const validateZipCode = zipCode => /^\d{5}$/.test(zipCode);
-const validateCVV = security => /^\d{3}$/.test(security);
-const validateActivity = activity => {
-    for (let i=0; i < activity.length; i++) {
-        if (activity[i].checked) {
-            return true;
+// form validation
+const validateName = name => {
+    return /^[a-z]+$/i.test(name);
+}
+const validateEmail = email => {
+    return /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email);
+}
+const validateCardNumber = cardNumber => {
+    return /^\d{13,16}$/.test(cardNumber);
+}
+const validateZipCode = zipCode => {
+    return /^\d{5}$/.test(zipCode);
+}
+const validateCVV = security => {
+    return /^\d{3}$/.test(security);
+}
+const validateActivity = {
+    validate: element => {
+        for (let i=0; i < element.length; i++) {
+            if (element[i].checked) {
+                return true;
+            } else if (i === element.length-1) {
+                return false;
+            }
         }
-        return false;
     }
 }
 
-//default style values
+// default style values
 window.addEventListener('load', () => {
     nameInput.focus();
     jobRoleInput.style.display = 'none';
@@ -40,7 +53,7 @@ window.addEventListener('load', () => {
     bitcoinSection.style.display = 'none';
 });
 
-//display/hide text input
+// display/hide text input
 jobRoleSelection.addEventListener('change', (e) => {
     let selection = e.target.value;
     if (selection === 'other') {
@@ -107,21 +120,52 @@ paymentOptions.addEventListener('change', () => {
     }
 });
 
-// form validation on submisiion
+// form validation and visual errors
 form.addEventListener('submit', (e) => {
-    function validator(valid) {
+    function validator(valid, element) {
+        console.log(element);
         if (valid) {
-            console.log('we good!');
+            if(element.parentNode.tagName === 'LABEL') {
+                element.parentNode.classList.remove('not-valid');
+                element.parentNode.classList.add('valid');
+                element.nextElementSibling.style.display = 'none';
+                console.log('we good!');
+            } else {
+                element.closest('fieldset').classList.remove('not-valid');
+                element.closest('fieldset').classList.add('valid');
+                element.lastElementChild.style.display = 'none';
+                console.log('we good!');
+            }
         } else {
             e.preventDefault();
-            console.log('no we not good!');
+            if(element.parentNode.tagName === 'LABEL') {
+                element.parentNode.classList.remove('valid');
+                element.parentNode.classList.add('not-valid');
+                element.nextElementSibling.style.display = 'inherit';
+            } else {
+                element.closest('fieldset').classList.remove('valid');
+                element.closest('fieldset').classList.add('not-valid');
+                element.lastElementChild.style.display = 'inherit';
+            }
         }
     }
 
-    validator(validateName(nameInput.value));
-    validator(validateEmail(emailInput.value));
-    validator(validateActivity(checkbox));
-    validator(validateCardNumber(cardDetails[0].value));
-    validator(validateZipCode(cardDetails[1].value));
-    validator(validateCVV(cardDetails[2].value));
+    validator(validateName(nameInput.value), nameInput);
+    validator(validateEmail(emailInput.value), emailInput);
+    validator(validateActivity['validate'](checkbox), activities);
+    validator(validateCardNumber(cardDetails[0].value), cardDetails[0]);
+    validator(validateZipCode(cardDetails[1].value), cardDetails[1]);
+    validator(validateCVV(cardDetails[2].value), cardDetails[2]);
+});
+
+checkbox.forEach(element => {
+    element.addEventListener('focus', (e) => {
+        e.target.parentNode.classList.add('focus');
+    });
+});
+
+checkbox.forEach(element => {
+    element.addEventListener('blur', (e) => {
+        e.target.parentNode.classList.remove('focus');
+    });
 });
