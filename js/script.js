@@ -1,19 +1,36 @@
 const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
 const jobRoleInput = document.getElementById('other-job-role');
 const jobRoleSelection = document.getElementById('title');
 const colorSelection = document.getElementById('color');
 const designTheme = document.getElementById('design');
 const activities = document.getElementById('activities');
+const checkbox = activities.querySelectorAll('input');
 const paymentOptions = document.getElementById('payment');
 const payMethod = paymentOptions.getElementsByTagName('option');
 const creditCard = document.querySelector('.credit-card-box');
+const cardDetails = creditCard.getElementsByTagName('input');
 const paypalSection = document.getElementById('paypal');
 const bitcoinSection = document.getElementById('bitcoin');
 const form = document.querySelector('form');
 let totalCost = 0;
 
+//form validation
+const validateName = name => /^[a-z]+$/i.test(name);
+const validateEmail = email => /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email);
+const validateCardNumber = cardNumber => /^\d{13,16}$/.test(cardNumber);
+const validateZipCode = zipCode => /^\d{5}$/.test(zipCode);
+const validateCVV = security => /^\d{3}$/.test(security);
+const validateActivity = activity => {
+    for (let i=0; i < activity.length; i++) {
+        if (activity[i].checked) {
+            return true;
+        }
+        return false;
+    }
+}
 
-//default styles/values
+//default style values
 window.addEventListener('load', () => {
     nameInput.focus();
     jobRoleInput.style.display = 'none';
@@ -21,8 +38,7 @@ window.addEventListener('load', () => {
     paymentOptions.querySelector('[value="credit-card"]').selected = true;
     paypalSection.style.display = 'none';
     bitcoinSection.style.display = 'none';
-})
-
+});
 
 //display/hide text input
 jobRoleSelection.addEventListener('change', (e) => {
@@ -64,6 +80,7 @@ activities.addEventListener('change', (e) => {
     }
 });
 
+// hide/display payment option  
 paymentOptions.addEventListener('change', () => {
     for (let i=1; i < payMethod.length; i++ ) {
         if (payMethod[i].value === paymentOptions.value) {
@@ -90,6 +107,21 @@ paymentOptions.addEventListener('change', () => {
     }
 });
 
+// form validation on submisiion
 form.addEventListener('submit', (e) => {
-    
+    function validator(valid) {
+        if (valid) {
+            console.log('we good!');
+        } else {
+            e.preventDefault();
+            console.log('no we not good!');
+        }
+    }
+
+    validator(validateName(nameInput.value));
+    validator(validateEmail(emailInput.value));
+    validator(validateActivity(checkbox));
+    validator(validateCardNumber(cardDetails[0].value));
+    validator(validateZipCode(cardDetails[1].value));
+    validator(validateCVV(cardDetails[2].value));
 });
