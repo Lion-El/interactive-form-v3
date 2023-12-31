@@ -15,28 +15,18 @@ const bitcoinSection = document.getElementById('bitcoin');
 const form = document.querySelector('form');
 let totalCost = 0;
 
-// form validation
-const validateName = name => {
-    return /^[a-z]+$/i.test(name);
-}
-const validateEmail = email => {
-    return /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email);
-}
-const validateCardNumber = cardNumber => {
-    return /^\d{13,16}$/.test(cardNumber);
-}
-const validateZipCode = zipCode => {
-    return /^\d{5}$/.test(zipCode);
-}
-const validateCVV = security => {
-    return /^\d{3}$/.test(security);
-}
-const validateActivity = {
-    validate: element => {
-        for (let i=0; i < element.length; i++) {
-            if (element[i].checked) {
+// form field validation object
+const formValidation  = {
+    name: name => /^[a-z]+$/i.test(name),
+    email: email => /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email),
+    ccnum: cardNumber => /^\d{13,16}$/.test(cardNumber),
+    zip: zipCode => /^\d{5}$/.test(zipCode),
+    cvv: security => /^\d{3}$/.test(security),
+    activities: activity => {
+        for (let i=0; i < activity.length; i++) {
+            if (activity[i].checked) {
                 return true;
-            } else if (i === element.length-1) {
+            } else if (i === activity.length-1) {
                 return false;
             }
         }
@@ -55,8 +45,8 @@ window.addEventListener('load', () => {
 
 // display/hide text input
 jobRoleSelection.addEventListener('change', (e) => {
-    let selection = e.target.value;
-    if (selection === 'other') {
+    let jobSelection = e.target.value;
+    if (jobSelection === 'other') {
         jobRoleInput.style.display = 'inline-block';
     } else {
         jobRoleInput.style.display = 'none';
@@ -84,6 +74,8 @@ designTheme.addEventListener('change', () => {
 activities.addEventListener('change', (e) => {
     const costDisplay = document.getElementById('activities-cost');
     const dataCost = e.target.getAttribute('data-cost');
+    const targetDate = e.target.getAttribute('data-day-and-time');
+    
     if (e.target.checked) {
         totalCost += parseInt(dataCost);
         costDisplay.textContent = `Total: $${totalCost}`;
@@ -91,6 +83,22 @@ activities.addEventListener('change', (e) => {
         totalCost -= parseInt(dataCost);
         costDisplay.textContent = `Total: $${totalCost}`;
     }
+    
+    checkbox.forEach(element => {
+        const arrayDate = element.getAttribute('data-day-and-time');
+        if (e.target.checked) {
+            if (!element.checked && arrayDate === targetDate) {
+                element.setAttribute('disabled', '');
+                element.closest('label').classList.add('disabled');
+            }
+        } else {
+            if (arrayDate === targetDate) {
+                element.removeAttribute('disabled');
+                element.closest('label').classList.remove('disabled');
+            }
+        }
+        
+    });
 });
 
 // hide/display payment option  
@@ -120,7 +128,51 @@ paymentOptions.addEventListener('change', () => {
     }
 });
 
-// form validation and visual errors
+// instant visual cofirmtion/errors
+form.addEventListener('keyup', (e) => {
+    function validator(valid, element) {
+        console.log(element);
+        if (valid) {
+            if(element.parentNode.tagName === 'LABEL') {
+                element.parentNode.classList.remove('not-valid');
+                element.parentNode.classList.add('valid');
+                element.nextElementSibling.style.display = 'none';
+                console.log('we good!');
+            } else {
+                element.closest('fieldset').classList.remove('not-valid');
+                element.closest('fieldset').classList.add('valid');
+                element.lastElementChild.style.display = 'none';
+                console.log('we good!');
+            }
+        } else {
+            e.preventDefault();
+            if (element.parentNode.tagName === 'LABEL') {
+                element.parentNode.classList.remove('valid');
+                if (element.value === '') {
+                    element.parentNode.classList.add('not-valid');
+                    element.nextElementSibling.innerText = 
+                    'Name field cannot be blank';
+                    element.nextElementSibling.style.display = 'inherit';
+                } else {
+                    element.parentNode.classList.add('not-valid');
+                    element.nextElementSibling.innerText = 
+                    'Please use alphabetic characters only';
+                    element.nextElementSibling.style.display = 'inherit';
+                }
+                
+            } else {
+                element.closest('fieldset').classList.remove('valid');
+                element.closest('fieldset').classList.add('not-valid');
+                element.lastElementChild.style.display = 'inherit';
+            }
+        }
+    }
+
+    const property = e.target.getAttribute('id');
+    validator(formValidation[property](e.target.value), e.target);
+});
+
+// visual cofirmtion/errors on submition
 form.addEventListener('submit', (e) => {
     function validator(valid, element) {
         console.log(element);
@@ -150,12 +202,12 @@ form.addEventListener('submit', (e) => {
         }
     }
 
-    validator(validateName(nameInput.value), nameInput);
-    validator(validateEmail(emailInput.value), emailInput);
-    validator(validateActivity['validate'](checkbox), activities);
-    validator(validateCardNumber(cardDetails[0].value), cardDetails[0]);
-    validator(validateZipCode(cardDetails[1].value), cardDetails[1]);
-    validator(validateCVV(cardDetails[2].value), cardDetails[2]);
+    validator(formValidation['name'](nameInput.value), nameInput);
+    validator(formValidation['email'](emailInput.value), emailInput);
+    validator(formValidation['activities'](checkbox), activities);
+    validator(formValidation['ccnum'](cardDetails[0].value), cardDetails[0]);
+    validator(formValidation['zip'](cardDetails[1].value), cardDetails[1]);
+    validator(formValidation['cvv'](cardDetails[2].value), cardDetails[2]);
 });
 
 checkbox.forEach(element => {
