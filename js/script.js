@@ -33,6 +33,43 @@ const formValidation  = {
     }
 }
 
+// visual validation
+const visualValidation = {
+    true: element => {
+        if (element.parentNode.tagName === 'LABEL') {
+            element.parentNode.classList.remove('not-valid');
+            element.parentNode.classList.add('valid');
+            element.nextElementSibling.style.display = 'none';
+            console.log('we good!');
+        } else {
+            element.closest('fieldset').classList.remove('not-valid');
+            element.closest('fieldset').classList.add('valid');
+            element.lastElementChild.style.display = 'none';
+            console.log('we good!');
+        }
+    }, 
+    false: element => {
+        if (element.parentNode.tagName === 'LABEL') {
+            element.parentNode.classList.remove('valid');
+            if (element.value === '') {
+                element.parentNode.classList.add('not-valid');
+                element.nextElementSibling.innerText = 
+                'Name field cannot be blank';
+                element.nextElementSibling.style.display = 'inherit';
+            } else {
+                element.parentNode.classList.add('not-valid');
+                element.nextElementSibling.innerText = 
+                'Please use corret format';
+                element.nextElementSibling.style.display = 'inherit';
+            }
+        } else {
+            element.closest('fieldset').classList.remove('valid');
+            element.closest('fieldset').classList.add('not-valid');
+            element.lastElementChild.style.display = 'inherit';
+        }
+    }
+}
+
 // default style values
 window.addEventListener('load', () => {
     nameInput.focus();
@@ -53,7 +90,7 @@ jobRoleSelection.addEventListener('change', (e) => {
     }
 });
 
-// enable/set color option
+// enable/set color options
 designTheme.addEventListener('change', () => {
     colorSelection.removeAttribute('disabled');
     const colorOption = document.querySelectorAll('option[data-theme]');
@@ -131,75 +168,19 @@ paymentOptions.addEventListener('change', () => {
 // instant visual cofirmtion/errors
 form.addEventListener('keyup', (e) => {
     function validator(valid, element) {
-        console.log(element);
-        if (valid) {
-            if(element.parentNode.tagName === 'LABEL') {
-                element.parentNode.classList.remove('not-valid');
-                element.parentNode.classList.add('valid');
-                element.nextElementSibling.style.display = 'none';
-                console.log('we good!');
-            } else {
-                element.closest('fieldset').classList.remove('not-valid');
-                element.closest('fieldset').classList.add('valid');
-                element.lastElementChild.style.display = 'none';
-                console.log('we good!');
-            }
-        } else {
-            e.preventDefault();
-            if (element.parentNode.tagName === 'LABEL') {
-                element.parentNode.classList.remove('valid');
-                if (element.value === '') {
-                    element.parentNode.classList.add('not-valid');
-                    element.nextElementSibling.innerText = 
-                    'Name field cannot be blank';
-                    element.nextElementSibling.style.display = 'inherit';
-                } else {
-                    element.parentNode.classList.add('not-valid');
-                    element.nextElementSibling.innerText = 
-                    'Please use alphabetic characters only';
-                    element.nextElementSibling.style.display = 'inherit';
-                }
-                
-            } else {
-                element.closest('fieldset').classList.remove('valid');
-                element.closest('fieldset').classList.add('not-valid');
-                element.lastElementChild.style.display = 'inherit';
-            }
-        }
+        visualValidation[valid.toString()](element, property);
     }
 
     const property = e.target.getAttribute('id');
     validator(formValidation[property](e.target.value), e.target);
+    
 });
 
 // visual cofirmtion/errors on submition
 form.addEventListener('submit', (e) => {
     function validator(valid, element) {
-        console.log(element);
-        if (valid) {
-            if(element.parentNode.tagName === 'LABEL') {
-                element.parentNode.classList.remove('not-valid');
-                element.parentNode.classList.add('valid');
-                element.nextElementSibling.style.display = 'none';
-                console.log('we good!');
-            } else {
-                element.closest('fieldset').classList.remove('not-valid');
-                element.closest('fieldset').classList.add('valid');
-                element.lastElementChild.style.display = 'none';
-                console.log('we good!');
-            }
-        } else {
-            e.preventDefault();
-            if(element.parentNode.tagName === 'LABEL') {
-                element.parentNode.classList.remove('valid');
-                element.parentNode.classList.add('not-valid');
-                element.nextElementSibling.style.display = 'inherit';
-            } else {
-                element.closest('fieldset').classList.remove('valid');
-                element.closest('fieldset').classList.add('not-valid');
-                element.lastElementChild.style.display = 'inherit';
-            }
-        }
+        visualValidation[valid.toString()](element);
+        valid ? true : e.preventDefault();
     }
 
     validator(formValidation['name'](nameInput.value), nameInput);
@@ -208,6 +189,7 @@ form.addEventListener('submit', (e) => {
     validator(formValidation['ccnum'](cardDetails[0].value), cardDetails[0]);
     validator(formValidation['zip'](cardDetails[1].value), cardDetails[1]);
     validator(formValidation['cvv'](cardDetails[2].value), cardDetails[2]);
+
 });
 
 checkbox.forEach(element => {
