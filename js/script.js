@@ -15,6 +15,30 @@ const bitcoinSection = document.getElementById('bitcoin');
 const form = document.querySelector('form');
 let totalCost = 0;
 
+// conditional error
+const conditionalError  = {
+    name: element => {
+        element.nextElementSibling.innerText = 
+        'Alphanumeric charachters only';
+    },
+    email: element => {
+        element.nextElementSibling.innerText = 
+        'Email format: john.doe@fullstackconference.com';
+    },
+    ccnum: element => {
+        element.nextElementSibling.innerText = 
+        'Credit Card format: 13-16 numeric digits';
+    },
+    zip: element => {
+        element.nextElementSibling.innerText = 
+        'Zip code format: 5 numeric digits';
+    },
+    cvv: element => {
+        element.nextElementSibling.innerText = 
+        'CVV format: 3 numeric digits';
+    },
+}
+
 // form field validation object
 const formValidation  = {
     name: name => /^[a-z]+$/i.test(name),
@@ -35,37 +59,36 @@ const formValidation  = {
 
 // visual validation
 const visualValidation = {
-    true: element => {
-        if (element.parentNode.tagName === 'LABEL') {
-            element.parentNode.classList.remove('not-valid');
-            element.parentNode.classList.add('valid');
-            element.nextElementSibling.style.display = 'none';
-            console.log('we good!');
-        } else {
-            element.closest('fieldset').classList.remove('not-valid');
-            element.closest('fieldset').classList.add('valid');
-            element.lastElementChild.style.display = 'none';
-            console.log('we good!');
-        }
-    }, 
-    false: element => {
-        if (element.parentNode.tagName === 'LABEL') {
-            element.parentNode.classList.remove('valid');
-            if (element.value === '') {
-                element.parentNode.classList.add('not-valid');
-                element.nextElementSibling.innerText = 
-                'Name field cannot be blank';
-                element.nextElementSibling.style.display = 'inherit';
+    true: { 
+        input: element => {
+            if (element.parentNode.tagName === 'LABEL') {
+                element.parentNode.classList.remove('not-valid');
+                element.parentNode.classList.add('valid');
+                element.nextElementSibling.style.display = 'none';
             } else {
-                element.parentNode.classList.add('not-valid');
-                element.nextElementSibling.innerText = 
-                'Please use corret format';
-                element.nextElementSibling.style.display = 'inherit';
+                element.closest('fieldset').classList.remove('not-valid');
+                element.closest('fieldset').classList.add('valid');
+                element.lastElementChild.style.display = 'none';
             }
-        } else {
-            element.closest('fieldset').classList.remove('valid');
-            element.closest('fieldset').classList.add('not-valid');
-            element.lastElementChild.style.display = 'inherit';
+        }
+    },
+    false: { 
+        input: (element, elementId) => {
+            if (element.parentNode.tagName === 'LABEL') {
+                element.parentNode.classList.remove('valid');
+                element.parentNode.classList.add('not-valid');
+                element.nextElementSibling.style.display = 'inherit';
+                if (element.value === '') {
+                    element.nextElementSibling.innerText = 
+                    'Field cannot be blank';
+                } else {
+                    conditionalError[elementId](element);
+                }
+            } else {
+                element.closest('fieldset').classList.remove('valid');
+                element.closest('fieldset').classList.add('not-valid');
+                element.lastElementChild.style.display = 'inherit';
+            }
         }
     }
 }
@@ -168,18 +191,18 @@ paymentOptions.addEventListener('change', () => {
 // instant visual cofirmtion/errors
 form.addEventListener('keyup', (e) => {
     function validator(valid, element) {
-        visualValidation[valid.toString()](element, property);
+        visualValidation[valid.toString()]['input'](element, elementId);
     }
 
-    const property = e.target.getAttribute('id');
-    validator(formValidation[property](e.target.value), e.target);
+    const elementId = e.target.getAttribute('id');
+    validator(formValidation[elementId](e.target.value), e.target);
     
 });
 
 // visual cofirmtion/errors on submition
 form.addEventListener('submit', (e) => {
     function validator(valid, element) {
-        visualValidation[valid.toString()](element);
+        visualValidation[valid.toString()]['input'](element);
         valid ? true : e.preventDefault();
     }
 
@@ -191,13 +214,13 @@ form.addEventListener('submit', (e) => {
     validator(formValidation['cvv'](cardDetails[2].value), cardDetails[2]);
 
 });
-
+// highlight field on focus
 checkbox.forEach(element => {
     element.addEventListener('focus', (e) => {
         e.target.parentNode.classList.add('focus');
     });
 });
-
+// remove highlight
 checkbox.forEach(element => {
     element.addEventListener('blur', (e) => {
         e.target.parentNode.classList.remove('focus');
