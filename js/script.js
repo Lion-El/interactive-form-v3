@@ -15,31 +15,67 @@ const bitcoinSection = document.getElementById('bitcoin');
 const form = document.querySelector('form');
 let totalCost = 0;
 
-// conditional error
-const conditionalError  = {
+// default style values
+window.addEventListener('load', () => {
+    nameInput.focus();
+    jobRoleInput.style.display = 'none';
+    colorSelection.setAttribute('disabled', '');
+    paymentOptions.querySelector('[value="credit-card"]').selected = true;
+    paypalSection.style.display = 'none';
+    bitcoinSection.style.display = 'none';
+    cardDetails[0].setAttribute('id', 'ccnum'); // prep for use as object property
+    cardDetails[0].closest('label').setAttribute('for', 'ccnum');
+});
+
+// default error handling 
+const formatingError  = {
     name: element => {
         element.nextElementSibling.innerText = 
-        'Alphanumeric charachters only';
+        'Name field must be formatted correctly';
     },
     email: element => {
         element.nextElementSibling.innerText = 
-        'Email format: john.doe@fullstackconference.com';
+        'Email address must be formatted correctly';
     },
     ccnum: element => {
         element.nextElementSibling.innerText = 
-        'Credit Card format: 13-16 numeric digits';
+        'Credit card number must be between 13 - 16 digits';
     },
     zip: element => {
         element.nextElementSibling.innerText = 
-        'Zip code format: 5 numeric digits';
+        'Zip Code must be 5 digits';
     },
     cvv: element => {
         element.nextElementSibling.innerText = 
-        'CVV format: 3 numeric digits';
-    },
+        'CVV must be 3 digits';
+    }
 }
 
-// form field validation object
+// conditional error handling
+const blankFieldError  = {
+    name: element => {
+        element.nextElementSibling.innerText = 
+        'Name field cannot be blank';
+    },
+    email: element => {
+        element.nextElementSibling.innerText = 
+        'Email field cannot be blank';
+    },
+    ccnum: element => {
+        element.nextElementSibling.innerText = 
+        'Card number field cannot be blank';
+    },
+    zip: element => {
+        element.nextElementSibling.innerText = 
+        'Zip code cannot be blank';
+    },
+    cvv: element => {
+        element.nextElementSibling.innerText = 
+        'CVV cannot be blank';
+    }
+}
+
+// form field validation
 const formValidation  = {
     name: name => /^[a-z]+$/i.test(name),
     email: email => /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email),
@@ -77,12 +113,12 @@ const visualValidation = {
             if (element.parentNode.tagName === 'LABEL') {
                 element.parentNode.classList.remove('valid');
                 element.parentNode.classList.add('not-valid');
-                element.nextElementSibling.style.display = 'inherit';
                 if (element.value === '') {
-                    element.nextElementSibling.innerText = 
-                    'Field cannot be blank';
+                    blankFieldError[elementId](element);
+                    element.nextElementSibling.style.display = 'inherit';
                 } else {
-                    conditionalError[elementId](element);
+                    formatingError[elementId](element);
+                    element.nextElementSibling.style.display = 'inherit';
                 }
             } else {
                 element.closest('fieldset').classList.remove('valid');
@@ -92,16 +128,6 @@ const visualValidation = {
         }
     }
 }
-
-// default style values
-window.addEventListener('load', () => {
-    nameInput.focus();
-    jobRoleInput.style.display = 'none';
-    colorSelection.setAttribute('disabled', '');
-    paymentOptions.querySelector('[value="credit-card"]').selected = true;
-    paypalSection.style.display = 'none';
-    bitcoinSection.style.display = 'none';
-});
 
 // display/hide text input
 jobRoleSelection.addEventListener('change', (e) => {
@@ -130,7 +156,7 @@ designTheme.addEventListener('change', () => {
     }
 });
 
-// display total activites cost
+// Update total activites cost
 activities.addEventListener('change', (e) => {
     const costDisplay = document.getElementById('activities-cost');
     const dataCost = e.target.getAttribute('data-cost');
@@ -191,28 +217,26 @@ paymentOptions.addEventListener('change', () => {
 // instant visual cofirmtion/errors
 form.addEventListener('keyup', (e) => {
     function validator(valid, element) {
-        visualValidation[valid.toString()]['input'](element, elementId);
+        visualValidation[valid.toString()]['input'](element, element.id);
     }
-
-    const elementId = e.target.getAttribute('id');
-    validator(formValidation[elementId](e.target.value), e.target);
-    
+    validator(formValidation[e.target.id](e.target.value), e.target);
 });
 
 // visual cofirmtion/errors on submition
 form.addEventListener('submit', (e) => {
     function validator(valid, element) {
-        visualValidation[valid.toString()]['input'](element);
-        valid ? true : e.preventDefault();
+        visualValidation[valid.toString()]['input'](element, element.id);
+        valid ? 'submission confirmed': e.preventDefault();
     }
 
-    validator(formValidation['name'](nameInput.value), nameInput);
-    validator(formValidation['email'](emailInput.value), emailInput);
+    const textInput = form.querySelectorAll('input[id]');
+    textInput.forEach(element => {
+        const attributes = element.getAttributeNames();
+        if (!attributes.includes('style')) {
+            validator(formValidation[element.id](element.value), element);
+        }
+    });
     validator(formValidation['activities'](checkbox), activities);
-    validator(formValidation['ccnum'](cardDetails[0].value), cardDetails[0]);
-    validator(formValidation['zip'](cardDetails[1].value), cardDetails[1]);
-    validator(formValidation['cvv'](cardDetails[2].value), cardDetails[2]);
-
 });
 // highlight field on focus
 checkbox.forEach(element => {
