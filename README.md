@@ -141,7 +141,7 @@ There are four arguments that tie all these features together:
 * The user input for validation
 * The boolean value for branching and conditional feedback
 * The target Element for traversing the DOM 
-* The element ID for branching
+* The element ID for branch/property/function selection 
 
 ## Form Validation
 
