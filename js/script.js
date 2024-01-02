@@ -23,7 +23,7 @@ window.addEventListener('load', () => {
     paymentOptions.querySelector('[value="credit-card"]').selected = true;
     paypalSection.style.display = 'none';
     bitcoinSection.style.display = 'none';
-    cardDetails[0].setAttribute('id', 'ccnum'); // prep for use as object property
+    cardDetails[0].setAttribute('id', 'ccnum'); // prep for use as an object property
     cardDetails[0].closest('label').setAttribute('for', 'ccnum');
 });
 
