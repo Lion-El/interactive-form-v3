@@ -78,7 +78,7 @@ const blankFieldError  = {
 // form field validation
 const formValidation  = {
     name: name => /^[a-z]+$/i.test(name),
-    email: email => /^[^@.][^@]+@[^@]+[.][a-z]+$/i.test(email),
+    email: email => /^[^@.][^@]+@[^@]+[.][a-z.]{3,}$/i.test(email),
     ccnum: cardNumber => /^\d{13,16}$/.test(cardNumber),
     zip: zipCode => /^\d{5}$/.test(zipCode),
     cvv: security => /^\d{3}$/.test(security),
