@@ -88,7 +88,9 @@ const visualValidation = {
 ```
 These two functions provide all the user feedback based on the input apart from the condition error messaging which is invoked with either an empty field or incorrect format.
 
-#### Conditional Error Messaging
+## Conditional Error Messaging
+
+All the input fields (name, email, credit card number, zip code and cvv) have conditional error messaging and are invoked/referenced via the element ID and element. 
 
 ```JavaScript
 const formatingError  = {

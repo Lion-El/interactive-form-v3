@@ -8,8 +8,8 @@ const activities = document.getElementById('activities');
 const checkbox = activities.querySelectorAll('input');
 const paymentOptions = document.getElementById('payment');
 const payMethod = paymentOptions.getElementsByTagName('option');
-const creditCard = document.querySelector('.credit-card-box');
-const cardDetails = creditCard.getElementsByTagName('input');
+const cardPaymentSection = document.getElementById('credit-card');
+const ccNum = document.getElementById('cc-num');
 const paypalSection = document.getElementById('paypal');
 const bitcoinSection = document.getElementById('bitcoin');
 const form = document.querySelector('form');
@@ -23,8 +23,8 @@ window.addEventListener('load', () => {
     paymentOptions.querySelector('[value="credit-card"]').selected = true;
     paypalSection.style.display = 'none';
     bitcoinSection.style.display = 'none';
-    cardDetails[0].setAttribute('id', 'ccnum'); // prep for use as an object property
-    cardDetails[0].closest('label').setAttribute('for', 'ccnum');
+    ccNum.setAttribute('id', 'ccnum'); // prep for use as an object property
+    ccNum.closest('label').setAttribute('for', 'ccnum');
 });
 
 // default error handling 
@@ -195,15 +195,15 @@ paymentOptions.addEventListener('change', () => {
                 case 'credit-card':
                     paypalSection.style.display = 'none';
                     bitcoinSection.style.display = 'none';
-                    creditCard.style.display = 'flex';
+                    cardPaymentSection.style.display = 'block';
                     break;
                 case 'paypal':
-                    creditCard.style.display = 'none';
+                    cardPaymentSection.style.display = 'none';
                     bitcoinSection.style.display = 'none';
                     paypalSection.style.display = 'block';
                     break;
                 case 'bitcoin':
-                    creditCard.style.display = 'none';
+                    cardPaymentSection.style.display = 'none';
                     paypalSection.style.display = 'none';
                     bitcoinSection.style.display = 'block';
                     break;
