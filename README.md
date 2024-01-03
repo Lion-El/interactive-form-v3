@@ -16,7 +16,7 @@ form.addEventListener('keyup', (e) => {
     validator(formValidation[e.target.id](e.target.value), e.target);
 });
 ```
-The above code first invokes a validation function within the event listener passing in two arguments. The first argument invokes an external validation function passing in user input. The external function is one of several functions within an object that gets invoked via the event target ID and corresponding property name.
+The above code first invokes a validation function within the event listener passing in two arguments. The first argument invokes an external method passing in user input. The external method is one of several methods within an object that gets invoked via the event target ID and corresponding property name.
 
 #### Regex Validation
 ```JavaScript
@@ -37,7 +37,7 @@ const formValidation  = {
     }
 }
 ```
-The user input is passed into the corresponding property/function, validated via regular expression then returned as a boolean.
+The user input is passed into the corresponding property/method, validated via regular expression then returned as a boolean.
 
 ```JavaScript
 form.addEventListener('keyup', (e) => {
@@ -47,7 +47,7 @@ form.addEventListener('keyup', (e) => {
     validator(formValidation[e.target.id](e.target.value), e.target);
 });
 ```
-The second argument that gets passed is the input element. The visual Validation is then invoked within the validator function. The visual validation is an object with two nested objects, each with a function to handle valid and invalid user input. 
+The second argument that gets passed is the input element. Visual validation is then invoked within the validator function. The visual validation is an object with two nested objects, each with a method to handle valid (true) and invalid (false) user input. 
 
 #### Visual Validation
 ```JavaScript
@@ -88,7 +88,7 @@ const visualValidation = {
 ```
 These two functions provide all the user feedback based on the input apart from the condition error messaging which is invoked with either an empty field or incorrect format.
 
-### Conditional Error Messaging
+#### Conditional Error Messaging
 
 ```JavaScript
 const formatingError  = {
@@ -139,9 +139,9 @@ const blankFieldError  = {
 ```
 There are four arguments that tie all these features together:
 * The user input for validation
-* The boolean value for branching and conditional feedback
-* The target Element for traversing the DOM 
-* The element ID for branch/property/function selection 
+* The boolean value for validation and branching
+* The target element for traversing the DOM 
+* The element ID for branch/property/method selection 
 
 ## Form Validation
 
